@@ -1,15 +1,16 @@
-def check_rules(prompt: str):
-    patterns = [
+def check_rule(text: str) -> float:
+    text = text.lower()
+
+    keywords = [
         "ignore previous instructions",
-        "bypass security",
+        "override system",
+        "bypass safety",
+        "jailbreak",
+        "act as",
         "reveal system prompt",
-        "act as admin",
-        "ignore all rules",
-        "forget previous instructions",
-        "system override",
-        "disable safety"
+        "disable filters"
     ]
 
-    prompt_lower = prompt.lower()
+    score = sum(1 for k in keywords if k in text)
 
-    return any(p in prompt_lower for p in patterns)
+    return min(score / 3, 1.0)

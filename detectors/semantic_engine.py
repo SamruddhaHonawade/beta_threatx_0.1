@@ -43,13 +43,11 @@ def detect_url_encoding(prompt):
 
 def check_semantic(prompt: str):
     keywords = [
-        "override",
-        "jailbreak",
-        "exploit",
-        "bypass",
-        "ignoreinstructions",
-        "revealsystemprompt",
-        "actasadmin"
+        "override", "jailbreak", "exploit", "bypass", "ignoreinstructions",
+        "revealsystemprompt", "actasadmin", "developermode", "donow",
+        "unfiltered", "withoutlimit", "danmode", "resetall", "forgetprior",
+        "stayincharacter", "internalreasoning", "initialmessage", "startfromscratch",
+        "sysadmin", "unrestricted", "hypotheticalscenario", "nopolicies"
     ]
 
     # Normalize original
