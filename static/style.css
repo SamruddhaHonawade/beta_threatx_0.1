@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    display: flex;
+    font-family: 'Inter', sans-serif;
+    background: #020617;
+    color: #e2e8f0;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 180px;
+    background: #020617;
+    border-right: 1px solid #1e293b;
+    padding: 15px;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    color: #38bdf8;
+    margin-bottom: 5px;
+}
+
+.tag {
+    font-size: 11px;
+    color: gray;
+}
+
+.menu button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    font-size: 13px;
+    background: #1e293b;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Main */
+.main {
+    flex: 1;
+    padding: 15px;
+}
+
+/* Cards */
+.card {
+    background: #0f172a;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    gap: 10px;
+}
+
+.stat {
+    flex: 1;
+    text-align: center;
+}
+
+.stat h3 {
+    font-size: 20px;
+    margin: 0;
+}
+
+/* Input */
+input {
+    width: 65%;
+    padding: 8px;
+    font-size: 13px;
+}
+
+button {
+    padding: 8px 10px;
+    font-size: 13px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* Table */
+table {
+    width: 100%;
+    font-size: 13px;
+}
+
+td, th {
+    padding: 6px;
+    border-bottom: 1px solid #1e293b;
+}
+
+/* Status */
+.blocked {
+    color: #ef4444;
+}
+
+.allowed {
+    color: #22c55e;
+}
