@@ -2,7 +2,9 @@ import re
 import base64
 import urllib.parse
 
-# Leetspeak mapping
+# -------------------------
+# 🔤 Leetspeak mapping
+# -------------------------
 leet_map = {
     '4': 'a', '@': 'a',
     '3': 'e',
@@ -12,6 +14,10 @@ leet_map = {
     '7': 't'
 }
 
+
+# -------------------------
+# 🧠 Normalize text
+# -------------------------
 def normalize_text(text):
     text = text.lower()
 
@@ -19,12 +25,15 @@ def normalize_text(text):
     for k, v in leet_map.items():
         text = text.replace(k, v)
 
-    # Remove spaces + special chars
+    # Remove non-letters
     text = re.sub(r'[^a-z]', '', text)
 
     return text
 
 
+# -------------------------
+# 🔓 Decode Base64
+# -------------------------
 def detect_base64(prompt):
     try:
         decoded = base64.b64decode(prompt).decode("utf-8")
@@ -33,45 +42,129 @@ def detect_base64(prompt):
         return None
 
 
+# -------------------------
+# 🌐 Decode URL Encoding
+# -------------------------
 def detect_url_encoding(prompt):
     try:
-        decoded = urllib.parse.unquote(prompt)
-        return decoded
+        return urllib.parse.unquote(prompt)
     except:
         return None
 
 
-def check_semantic(prompt: str):
-    keywords = [
-        "override", "jailbreak", "exploit", "bypass", "ignoreinstructions",
-        "revealsystemprompt", "actasadmin", "developermode", "donow",
-        "unfiltered", "withoutlimit", "danmode", "resetall", "forgetprior",
-        "stayincharacter", "internalreasoning", "initialmessage", "startfromscratch",
-        "sysadmin", "unrestricted", "hypotheticalscenario", "nopolicies"
-    ]
+# -------------------------
+# 🔥 Semantic Detection
+# -------------------------
+def check_semantic(prompt: str) -> float:
 
-    # Normalize original
+    # 🔴 Categorized keywords (weighted)
+    keyword_weights = {
+
+        # Prompt injection / override (HIGH RISK)
+        "ignorepreviousinstructions": 1.0,
+        "disregardinstructions": 1.0,
+        "override": 1.0,
+        "bypass": 1.0,
+        "jailbreak": 1.0,
+        "disablefilters": 1.0,
+        "breakrules": 1.0,
+
+        # System prompt extraction (HIGH RISK)
+        "revealsystemprompt": 1.0,
+        "showhiddeninstructions": 1.0,
+        "systemprompt": 0.9,
+        "internalinstructions": 0.9,
+        "developermode": 0.9,
+
+        # Role manipulation (MEDIUM)
+        "actasadmin": 0.7,
+        "actas": 0.6,
+        "pretendto": 0.6,
+        "simulatebeing": 0.6,
+        "roleplay": 0.6,
+
+        # Data exfiltration (HIGH)
+        "apikey": 1.0,
+        "token": 0.8,
+        "password": 1.0,
+        "secret": 1.0,
+        "credentials": 1.0,
+        "privatekey": 1.0,
+
+        # Safety bypass tricks
+        "unfiltered": 0.8,
+        "withoutlimit": 0.8,
+        "nopolicies": 0.9,
+        "no restrictions": 0.9,
+        "safemodeoff": 0.9,
+
+        # DAN / jailbreak styles
+        "danmode": 1.0,
+        "donow": 0.8,
+        "resetall": 0.7,
+        "forgetprior": 0.7,
+        "stayincharacter": 0.6,
+
+        # Obfuscation / encoding tricks
+        "base64": 0.6,
+        "rot13": 0.6,
+        "encode": 0.5,
+        "obfuscate": 0.6,
+        "evadedetection": 0.8,
+
+        # Advanced injection patterns
+        "systemoverride": 1.0,
+        "adminmode": 1.0,
+        "rootaccess": 1.0,
+        "debugmode": 0.7,
+
+        # Context tricks
+        "hypotheticalscenario": 0.6,
+        "startfromscratch": 0.6,
+        "initialmessage": 0.6,
+        "internalreasoning": 0.7,
+    }
+
+    # -------------------------
+    # 🔍 Check function
+    # -------------------------
+    def evaluate(text):
+        score = 0
+
+        for k, weight in keyword_weights.items():
+            if k in text:
+                score += weight
+
+        return min(score, 1.0)
+
+
+    # -------------------------
+    # 🧠 Normalize original
+    # -------------------------
     normalized = normalize_text(prompt)
+    score_main = evaluate(normalized)
 
-    # Check normal + normalized
-    for word in keywords:
-        if word in normalized:
-            return True
-
-    # Check Base64 attack
+    # -------------------------
+    # 🔓 Base64 check
+    # -------------------------
     decoded_b64 = detect_base64(prompt)
+    score_b64 = 0
     if decoded_b64:
         norm_b64 = normalize_text(decoded_b64)
-        for word in keywords:
-            if word in norm_b64:
-                return True
+        score_b64 = evaluate(norm_b64)
 
-    # Check URL encoding
+    # -------------------------
+    # 🌐 URL decode check
+    # -------------------------
     decoded_url = detect_url_encoding(prompt)
+    score_url = 0
     if decoded_url:
         norm_url = normalize_text(decoded_url)
-        for word in keywords:
-            if word in norm_url:
-                return True
+        score_url = evaluate(norm_url)
 
-    return False
+    # -------------------------
+    # 🎯 Final score (max risk)
+    # -------------------------
+    final_score = max(score_main, score_b64, score_url)
+
+    return final_score
